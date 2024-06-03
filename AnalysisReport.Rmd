@@ -1,0 +1,110 @@
+---
+title: "AnalysisDocument_draft"
+output: pdf_document
+date: "2024-06-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(stringr)
+```
+
+# Introduction
+
+This report presents the results of microplastics analysis conducted using Fourier-transform infrared spectroscopy (FTIR) at the Moore Institute for Plastic Pollution Research. The analysis includes the number of particles per sample, their size, shape, and polymer type.
+
+# Data Summary
+
+```{r data-summary}
+# Load the dataset (assuming the dataset is named 'microplastics_data.csv')
+microplastics_data <- read.csv("particle_details_all.csv")
+mp_data <- microplastics_data %>%
+  filter(bad_spectra == "FALSE" & material_class != "unknown")
+mp_data$sample_id = str_sub(mp_data$sample_id,1,nchar(mp_data$sample_id)-4)
+
+# Display the first few rows of the dataset
+head(mp_data)
+```
+
+# Number of Particles per Sample
+
+```{r particles-per-sample}
+# Summarize the number of particles per sample
+particles_per_sample <- mp_data %>%
+  group_by(sample_id) %>%
+  summarize(Num_Particles = n())
+
+# Display the summary table
+kable(particles_per_sample, caption = "Number of Particles per Sample")
+
+# Plot the number of particles per sample
+ggplot(particles_per_sample, aes(x = sample_id, y = Num_Particles)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Particles per Sample", x = "Sample", y = "Number of Particles") +
+  theme_minimal()
+```
+
+# Particle Size Distribution
+
+```{r particle-size-distribution}
+# Summarize the particle size distribution
+particle_size_distribution <- microplastics_data %>%
+  group_by(Size) %>%
+  summarize(Count = n())
+
+# Display the summary table
+kable(particle_size_distribution, caption = "Particle Size Distribution")
+
+# Plot the particle size distribution
+ggplot(particle_size_distribution, aes(x = Size, y = Count)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Particle Size Distribution", x = "Size", y = "Count") +
+  theme_minimal()
+```
+
+# Particle Shape Distribution
+
+```{r particle-shape-distribution}
+# Summarize the particle shape distribution
+particle_shape_distribution <- microplastics_data %>%
+  group_by(Shape) %>%
+  summarize(Count = n())
+
+# Display the summary table
+kable(particle_shape_distribution, caption = "Particle Shape Distribution")
+
+# Plot the particle shape distribution
+ggplot(particle_shape_distribution, aes(x = Shape, y = Count)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Particle Shape Distribution", x = "Shape", y = "Count") +
+  theme_minimal()
+```
+
+# Polymer Type Distribution
+
+```{r polymer-type-distribution}
+# Summarize the polymer type distribution
+polymer_type_distribution <- microplastics_data %>%
+  group_by(Polymer_Type) %>%
+  summarize(Count = n())
+
+# Display the summary table
+kable(polymer_type_distribution, caption = "Polymer Type Distribution")
+
+# Plot the polymer type distribution
+ggplot(polymer_type_distribution, aes(x = Polymer_Type, y = Count)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Polymer Type Distribution", x = "Polymer Type", y = "Count") +
+  theme_minimal()
+```
+
+# Conclusion
+
+This report provides a detailed analysis of the microplastics collected and analyzed using FTIR. The data includes the number of particles, their size, shape, and polymer type, which are crucial for understanding the extent and nature of microplastic pollution.
+
+```
+
+Replace `"microplastics_data.csv"` with the actual path to your dataset file. This R Markdown document will generate an HTML report with summaries and visualizations of the microplastics analysis data.
